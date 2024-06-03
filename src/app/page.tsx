@@ -10,7 +10,6 @@ import { HiDotsVertical } from "react-icons/hi";
 import { nanoid } from "nanoid";
 import Markdown from "react-markdown";
 import { Switch } from "@headlessui/react";
-import { enable as enableDarkMode, disable as disableDarkMode } from 'darkreader'
 import { socket } from "@/socket"
 
 type ChatMessageData = {
@@ -277,13 +276,9 @@ function SettingsSideBar() {
     const [enabled, setEnabled] = React.useState<boolean>(false)
     React.useEffect(() => {
         if (enabled) {
-            enableDarkMode({
-                brightness: 100,
-                contrast: 90,
-                sepia: 10,
-            })
+            // enableDarkMode
         } else {
-            disableDarkMode()
+            // disableDarkMode
         }
     }, [enabled])
     return (
