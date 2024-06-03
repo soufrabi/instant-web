@@ -8,8 +8,10 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
 import { HiDotsVertical } from "react-icons/hi";
 import { nanoid } from "nanoid";
-import { socket } from "@/socket"
 import Markdown from "react-markdown";
+import { Switch } from "@headlessui/react";
+import { enable as enableDarkMode, disable as disableDarkMode } from 'darkreader'
+import { socket } from "@/socket"
 
 type ChatMessageData = {
     text: string,
@@ -22,6 +24,10 @@ type ChatAreaProps = {
     sendMessage: (chatMessageText: string) => void,
 }
 
+enum AppMode {
+    INCOGNITO_CHAT,
+    SETTINGS,
+}
 
 const myID: number = 1
 const initialChatMessageList: Array<ChatMessageData> = [
@@ -37,6 +43,52 @@ const initialChatMessageList: Array<ChatMessageData> = [
     }
 
 ]
+
+type LeftSmallSideBarProps = {
+    appMode: AppMode,
+    setAppMode: React.Dispatch<React.SetStateAction<AppMode>>,
+}
+
+function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps) {
+    return (
+
+        <div className="h-full w-16 bg-gray-100 flex flex-col gap-4 py-4 items-center justify-between">
+            <div className="flex flex-col gap-6 py-2">
+                <button
+                    className=""
+                    onClick={() => { setAppMode(AppMode.INCOGNITO_CHAT) }}
+                >
+                    <BsIncognito
+                        className="w-6 h-6"
+                    />
+                </button>
+                <button
+                    className=""
+                >
+                    <BsChatLeftText
+                        className="w-6 h-6"
+                    />
+                </button>
+            </div>
+
+            <div className="flex flex-col gap-6 py-2">
+                <button
+                    className=""
+                    onClick={() => { setAppMode(AppMode.SETTINGS) }}
+                >
+                    <IoSettingsOutline
+                        className="w-6 h-6"
+                    />
+                </button>
+                <button className="">
+                    <CgProfile
+                        className="w-6 h-6"
+                    />
+                </button>
+            </div>
+        </div>
+    )
+}
 
 function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
     const chatListBottomRef = React.useRef<HTMLDivElement>(null)
@@ -131,10 +183,91 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
 
 }
 
+function AnonChatSideBar() {
+    return (
+        <div className="w-[calc(20vw)] h-full flex flex-col bg-white">
+            <div className="flex flex-row py-4 px-4 justify-between items-center">
+                <span
+                    className="font-bold text-lg"
+                >Incognito Chat</span>
+                <div className="cursor-pointer">
+                    <HiDotsVertical
+                        className="w-5 h-5"
+                    />
+                </div>
+
+            </div>
+
+            <div className="flex flex-row gap-2 px-4 py-2">
+                <span
+                >Room No&nbsp;</span>
+                <input
+                    type="text"
+                    className="border-gray-300 outline-none border-2 px-1"
+                />
+            </div>
+            <div className="flex flex-row gap-2 px-4 py-2">
+                <span
+                >Password</span>
+                <input
+                    type="password"
+                    className="border-gray-300 outline-none border-2 px-1"
+                />
+            </div>
+            <div className="flex flex-row gap-2 px-4 py-2">
+                <button className="text-gray-800 bg-green-200 p-2 rounded-md">
+                    <span
+                    >Join</span>
+                </button>
+                <button className="text-gray-800 bg-green-200 p-2 rounded-md">
+                    <span
+                    >Create</span>
+                </button>
+            </div>
+        </div>
+
+    )
+
+}
+
+function SettingsSideBar() {
+    const [enabled, setEnabled] = React.useState<boolean>(false)
+    React.useEffect(() => {
+        if (enabled) {
+            enableDarkMode({
+                brightness: 100,
+                contrast: 90,
+                sepia: 10,
+            })
+        } else {
+            disableDarkMode()
+        }
+    }, [enabled])
+    return (
+        <div className="w-[calc(20vw)] h-full flex flex-col bg-white">
+            <div className="flex flex-row gap-2 px-4 py-4">
+                <div>
+                    <span
+                    >Dark Mode</span>
+                </div>
+                <Switch
+                    checked={enabled}
+                    onChange={setEnabled}
+                    className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600"
+                >
+                    <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
+                </Switch>
+            </div>
+        </div>
+    )
+
+}
+
 export default function Home() {
     // const [isConnected, setIsConnected] = React.useState<boolean>(false)
     // const [transportName, setTransportName] = React.useState<any | null>(null)
     const [chatMessageList, setChatMessageList] = React.useState<Array<ChatMessageData>>(initialChatMessageList)
+    const [appMode, setAppMode] = React.useState<AppMode>(AppMode.INCOGNITO_CHAT)
 
     const appendToChatMessageList = (newChatMessage: ChatMessageData) => {
         setChatMessageList((prevList) => [...prevList, newChatMessage])
@@ -196,73 +329,15 @@ export default function Home() {
     return (
         <main className="h-screen w-screen flex flex-row p-5 bg-slate-300">
 
-            <div className="h-full w-16 bg-gray-100 flex flex-col gap-4 py-4 items-center justify-between">
-                <div className="flex flex-col gap-6 py-2">
-                    <button className="">
-                        <BsIncognito
-                            className="w-6 h-6"
-                        />
-                    </button>
-                    <button className="">
-                        <BsChatLeftText
-                            className="w-6 h-6"
-                        />
-                    </button>
-                </div>
+            <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
 
-                <div className="flex flex-col gap-6 py-2">
-                    <button className="">
-                        <IoSettingsOutline
-                            className="w-6 h-6"
-                        />
-                    </button>
-                    <button className="">
-                        <CgProfile
-                            className="w-6 h-6"
-                        />
-                    </button>
-                </div>
-            </div>
-            <div className="w-[calc(20vw)] h-full flex flex-col bg-white">
-                <div className="flex flex-row py-4 px-4 justify-between items-center">
-                    <span
-                        className="font-bold text-lg"
-                    >Incognito Chat</span>
-                    <div className="cursor-pointer">
-                        <HiDotsVertical
-                            className="w-5 h-5"
-                        />
-                    </div>
+            {
+                appMode === AppMode.INCOGNITO_CHAT && <AnonChatSideBar />
+            }
+            {
+                appMode === AppMode.SETTINGS && <SettingsSideBar />
+            }
 
-                </div>
-
-                <div className="flex flex-row gap-2 px-4 py-2">
-                    <span
-                    >Room No&nbsp;</span>
-                    <input
-                        type="text"
-                        className="border-gray-300 outline-none border-2 px-1"
-                    />
-                </div>
-                <div className="flex flex-row gap-2 px-4 py-2">
-                    <span
-                    >Password</span>
-                    <input
-                        type="password"
-                        className="border-gray-300 outline-none border-2 px-1"
-                    />
-                </div>
-                <div className="flex flex-row gap-2 px-4 py-2">
-                    <button className="text-gray-800 bg-green-200 p-2 rounded-md">
-                        <span
-                        >Join</span>
-                    </button>
-                    <button className="text-gray-800 bg-green-200 p-2 rounded-md">
-                        <span
-                        >Create</span>
-                    </button>
-                </div>
-            </div>
             <ChatArea chatMessageList={chatMessageList} sendMessage={sendMessage} />
             {
                 // <div className="">
@@ -271,7 +346,7 @@ export default function Home() {
                 // </div>
             }
 
-        </main>
+        </main >
 
 
     )
