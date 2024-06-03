@@ -184,12 +184,22 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
 }
 
 type AnonChatSideBarProps = {
-    roomNumber: string,
-    setRoomNumber: React.Dispatch<React.SetStateAction<string>>
+    currentRoomNumber: string,
+    isInRoom: boolean,
+    joinRoom: (room: string) => void,
 }
 
-function AnonChatSideBar({ roomNumber, setRoomNumber }: AnonChatSideBarProps) {
+function AnonChatSideBar({ currentRoomNumber, isInRoom, joinRoom }: AnonChatSideBarProps) {
+    const [roomNumber, setRoomNumber] = React.useState<string>("")
     const [password, setPassword] = React.useState<string>("")
+    const statusMessage = React.useMemo<string>(() => {
+        if (isInRoom) {
+            return `Currently in Room No. ${currentRoomNumber} `
+        } else {
+            return "Please join a room"
+        }
+
+    }, [currentRoomNumber, isInRoom])
 
     const handleRoomNumberChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setRoomNumber(ev.target.value)
@@ -200,11 +210,7 @@ function AnonChatSideBar({ roomNumber, setRoomNumber }: AnonChatSideBarProps) {
     }
 
     const handleJoinRoomButtonClick = () => {
-        const roomNumberTrimmed = roomNumber.trim()
-        if (roomNumberTrimmed.length > 0) {
-            socket.emit('join-room', roomNumber)
-        }
-
+        joinRoom(roomNumber)
     }
 
     return (
@@ -243,7 +249,7 @@ function AnonChatSideBar({ roomNumber, setRoomNumber }: AnonChatSideBarProps) {
             </div>
             <div className="flex flex-row gap-2 px-4 py-2">
                 <button
-                    className="text-gray-800 bg-green-200 p-2 rounded-md"
+                    className="bg-green-200 p-2 rounded-md"
                     onClick={handleJoinRoomButtonClick}
                 >
                     <span
@@ -255,6 +261,11 @@ function AnonChatSideBar({ roomNumber, setRoomNumber }: AnonChatSideBarProps) {
                     //     >Create</span>
                     // </button>
                 }
+            </div>
+            <div className="flex flex-row px-4 py-4">
+                <span
+                    className=""
+                >{statusMessage}</span>
             </div>
         </div>
 
@@ -300,14 +311,15 @@ export default function Home() {
     // const [transportName, setTransportName] = React.useState<any | null>(null)
     const [chatMessageList, setChatMessageList] = React.useState<Array<ChatMessageData>>(initialChatMessageList)
     const [appMode, setAppMode] = React.useState<AppMode>(AppMode.INCOGNITO_CHAT)
-    const [roomNumber, setRoomNumber] = React.useState<string>("")
+    const [currentRoomNumber, setCurrentRoomNumber] = React.useState<string>("")
+    const [isInRoom, setIsInRoom] = React.useState<boolean>(false)
 
     const appendToChatMessageList = (newChatMessage: ChatMessageData) => {
         setChatMessageList((prevList) => [...prevList, newChatMessage])
     }
 
     const sendMessage = (chatMessageText: string) => {
-        socket.emit('send-message', chatMessageText, roomNumber)
+        socket.emit('send-message', chatMessageText, currentRoomNumber)
     }
 
 
@@ -335,6 +347,19 @@ export default function Home() {
         })
     }
 
+    const joinRoom = (roomNumber: string) => {
+
+        const roomNumberTrimmed = roomNumber.trim()
+        if (roomNumberTrimmed.length > 0) {
+            socket.emit('join-room', roomNumberTrimmed, () => {
+                setIsInRoom(true)
+                setCurrentRoomNumber(roomNumber)
+            })
+        }
+    }
+
+
+
 
     React.useEffect(() => {
 
@@ -347,7 +372,7 @@ export default function Home() {
         socket.on("connect", onConnect)
         socket.on("disconnect", onDisconnect)
 
-        socket.on('receive-message', receiveMessage)
+        socket.on("receive-message", receiveMessage)
 
         return () => {
             socket.off("connect", onConnect)
@@ -366,13 +391,13 @@ export default function Home() {
             <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
 
             {
-                appMode === AppMode.INCOGNITO_CHAT && <AnonChatSideBar roomNumber={roomNumber} setRoomNumber={setRoomNumber} />
+                appMode === AppMode.INCOGNITO_CHAT && <AnonChatSideBar currentRoomNumber={currentRoomNumber} isInRoom={isInRoom} joinRoom={joinRoom} />
             }
             {
                 appMode === AppMode.SETTINGS && <SettingsSideBar />
             }
 
-            <ChatArea chatMessageList={chatMessageList} sendMessage={sendMessage} roomNumber={roomNumber} />
+            <ChatArea chatMessageList={chatMessageList} sendMessage={sendMessage} />
             {
                 // <div className="">
                 //     <p>Status : {isConnected ? "connected" : "disconnected"} </p>
