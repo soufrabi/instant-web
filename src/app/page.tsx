@@ -32,7 +32,7 @@ const initialChatMessageList: Array<ChatMessageData> = [
 ]
 
 function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
-    const chatListRef = React.useRef<HTMLDivElement>(null)
+    const chatListBottomRef = React.useRef<HTMLDivElement>(null)
     const [composeMessageTextAreaValue, setComposeMessageTextAreaValue] = React.useState<string>("")
     const handleComposeMessageTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
         // console.log(composeMessageTextAreaValue)
@@ -40,11 +40,14 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
     }
     let lastKey: string = ""
 
+    const scrollToBottomOfChatList = () => {
+        chatListBottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+
     const handleSendButtonClick = () => {
         if (composeMessageTextAreaValue.length > 0) {
             sendMessage(composeMessageTextAreaValue)
             setComposeMessageTextAreaValue("")
-            // chatListRef.current?.scroll
         }
     }
 
@@ -63,11 +66,14 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
 
     }
 
+    React.useEffect(() => {
+        scrollToBottomOfChatList()
+    }, [chatMessageList])
+
     return (
         <div className="h-full w-full bg-sky-50 flex flex-col">
             <div
                 className="flex-1 flex flex-col gap-2 px-2 py-2 overflow-auto"
-                ref={chatListRef}
             >
                 {
                     chatMessageList.map((chatMessage) => (
@@ -79,6 +85,8 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
                         </div>
                     ))
                 }
+
+                <div ref={chatListBottomRef}></div>
             </div>
             <div className="flex flex-row items-center gap-2 px-4 py-3">
                 <textarea
