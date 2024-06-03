@@ -136,7 +136,7 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
                 className="flex-1 flex flex-col gap-2 px-2 py-2 overflow-auto"
             >
                 {
-                    chatMessageList.map((chatMessage) => (
+                    chatMessageList.map((chatMessage: ChatMessageData) => (
                         <div
                             key={nanoid()}
                             className={`flex flex-row ${chatMessage.from === myID ? "justify-end" : "justify-start"}`}
@@ -183,7 +183,30 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
 
 }
 
-function AnonChatSideBar() {
+type AnonChatSideBarProps = {
+    roomNumber: string,
+    setRoomNumber: React.Dispatch<React.SetStateAction<string>>
+}
+
+function AnonChatSideBar({ roomNumber, setRoomNumber }: AnonChatSideBarProps) {
+    const [password, setPassword] = React.useState<string>("")
+
+    const handleRoomNumberChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+        setRoomNumber(ev.target.value)
+    }
+
+    const handlePasswordChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(ev.target.value)
+    }
+
+    const handleJoinRoomButtonClick = () => {
+        const roomNumberTrimmed = roomNumber.trim()
+        if (roomNumberTrimmed.length > 0) {
+            socket.emit('join-room', roomNumber)
+        }
+
+    }
+
     return (
         <div className="w-[calc(20vw)] h-full flex flex-col bg-white">
             <div className="flex flex-row py-4 px-4 justify-between items-center">
@@ -204,6 +227,8 @@ function AnonChatSideBar() {
                 <input
                     type="text"
                     className="border-gray-300 outline-none border-2 px-1"
+                    value={roomNumber}
+                    onChange={handleRoomNumberChange}
                 />
             </div>
             <div className="flex flex-row gap-2 px-4 py-2">
@@ -212,17 +237,24 @@ function AnonChatSideBar() {
                 <input
                     type="password"
                     className="border-gray-300 outline-none border-2 px-1"
+                    value={password}
+                    onChange={handlePasswordChange}
                 />
             </div>
             <div className="flex flex-row gap-2 px-4 py-2">
-                <button className="text-gray-800 bg-green-200 p-2 rounded-md">
+                <button
+                    className="text-gray-800 bg-green-200 p-2 rounded-md"
+                    onClick={handleJoinRoomButtonClick}
+                >
                     <span
                     >Join</span>
                 </button>
-                <button className="text-gray-800 bg-green-200 p-2 rounded-md">
-                    <span
-                    >Create</span>
-                </button>
+                {
+                    // <button className="text-gray-800 bg-green-200 p-2 rounded-md">
+                    //     <span
+                    //     >Create</span>
+                    // </button>
+                }
             </div>
         </div>
 
@@ -268,13 +300,14 @@ export default function Home() {
     // const [transportName, setTransportName] = React.useState<any | null>(null)
     const [chatMessageList, setChatMessageList] = React.useState<Array<ChatMessageData>>(initialChatMessageList)
     const [appMode, setAppMode] = React.useState<AppMode>(AppMode.INCOGNITO_CHAT)
+    const [roomNumber, setRoomNumber] = React.useState<string>("")
 
     const appendToChatMessageList = (newChatMessage: ChatMessageData) => {
         setChatMessageList((prevList) => [...prevList, newChatMessage])
     }
 
     const sendMessage = (chatMessageText: string) => {
-        socket.emit('send-message', chatMessageText)
+        socket.emit('send-message', chatMessageText, roomNumber)
     }
 
 
@@ -301,6 +334,7 @@ export default function Home() {
             from: 1,
         })
     }
+
 
     React.useEffect(() => {
 
@@ -332,13 +366,13 @@ export default function Home() {
             <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
 
             {
-                appMode === AppMode.INCOGNITO_CHAT && <AnonChatSideBar />
+                appMode === AppMode.INCOGNITO_CHAT && <AnonChatSideBar roomNumber={roomNumber} setRoomNumber={setRoomNumber} />
             }
             {
                 appMode === AppMode.SETTINGS && <SettingsSideBar />
             }
 
-            <ChatArea chatMessageList={chatMessageList} sendMessage={sendMessage} />
+            <ChatArea chatMessageList={chatMessageList} sendMessage={sendMessage} roomNumber={roomNumber} />
             {
                 // <div className="">
                 //     <p>Status : {isConnected ? "connected" : "disconnected"} </p>
