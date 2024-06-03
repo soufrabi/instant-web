@@ -4,51 +4,154 @@ import React from "react"
 import { IoMdSend } from "react-icons/io";
 import { socket } from "@/socket"
 
+type ChatMessageData = {
+    text: string,
+    from: number,
+    to: number,
+}
+
+type ChatAreaProps = {
+    chatMessageList: Array<ChatMessageData>,
+    sendMessage: (chatMessageText: string) => void,
+}
 
 
-export default function Home() {
-    const [isConnected, setIsConnected] = React.useState<boolean>(false)
-    const [transportName, setTransportName] = React.useState<any | null>(null)
-    const [chatHistoryTextAreaValue, setChatHistoryTextAreaValue] = React.useState<string>("")
-    const [composeMessageTextAreaValue, setComposeMessageTextAreaValue] = React.useState<string>("")
-
-
-    const handleComposeMessageTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setComposeMessageTextAreaValue(ev.target.value)
+const myID: number = 1
+const initialChatMessageList: Array<ChatMessageData> = [
+    {
+        text: "Hello",
+        from: 1,
+        to: 2,
+    },
+    {
+        text: "I am fine",
+        from: 2,
+        to: 1
     }
 
-    const handleSendMessage = (ev: React.FormEvent<HTMLFormElement>) => {
-        ev.preventDefault()
+]
 
-        socket.emit('send-message', composeMessageTextAreaValue)
+function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
+    const chatListRef = React.useRef<HTMLDivElement>(null)
+    const [composeMessageTextAreaValue, setComposeMessageTextAreaValue] = React.useState<string>("")
+    const handleComposeMessageTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+        // console.log(composeMessageTextAreaValue)
+        setComposeMessageTextAreaValue(ev.target.value)
+    }
+    let lastKey: string = ""
 
+    const handleSendButtonClick = () => {
+        if (composeMessageTextAreaValue.length > 0) {
+            sendMessage(composeMessageTextAreaValue)
+            setComposeMessageTextAreaValue("")
+            // chatListRef.current?.scroll
+        }
+    }
+
+    const handleComposeMessageKeyDown = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        // console.log(`Key pressed : {ev.key}`)
+        if (ev.key === "Enter" && lastKey !== "Shift") {
+            ev.preventDefault()
+            handleSendButtonClick()
+        }
+
+        if (ev.key !== "Enter") {
+            lastKey = ev.key
+        }
+
+        // console.log(`LastKey : ${lastKey}`)
+
+    }
+
+    return (
+        <div className="h-full w-full bg-sky-50 flex flex-col">
+            <div
+                className="flex-1 flex flex-col gap-2 px-2 py-2 overflow-auto"
+                ref={chatListRef}
+            >
+                {
+                    chatMessageList.map((chatMessage) => (
+                        <div className={`flex flex-row ${chatMessage.from === myID ? "justify-end" : "justify-start"}`} >
+                            <div className="p-3 rounded-2xl bg-teal-200">
+                                {chatMessage.text}
+                            </div>
+
+                        </div>
+                    ))
+                }
+            </div>
+            <div className="flex flex-row items-center gap-2 px-4 py-3">
+                <textarea
+                    className="flex-1 bg-orange-50 rounded-2xl p-3 outline-yellow-600"
+                    value={composeMessageTextAreaValue}
+                    onChange={handleComposeMessageTextAreaValueChange}
+                    onKeyDown={handleComposeMessageKeyDown}
+                />
+                <button
+
+                    className="h-fit bg-white p-2 rounded-2xl"
+                    onClick={handleSendButtonClick}
+                // disabled={composeMessageTextAreaValue.length === 0}
+                >
+
+                    <IoMdSend
+                        className="w-8 h-8 text-green-600"
+                    />
+
+                </button>
+            </div>
+
+
+        </div>
+    )
+
+
+}
+
+export default function Home() {
+    // const [isConnected, setIsConnected] = React.useState<boolean>(false)
+    // const [transportName, setTransportName] = React.useState<any | null>(null)
+    const [chatMessageList, setChatMessageList] = React.useState<Array<ChatMessageData>>(initialChatMessageList)
+
+    const appendToChatMessageList = (newChatMessage: ChatMessageData) => {
+        setChatMessageList((prevList) => [...prevList, newChatMessage])
+    }
+
+    const sendMessage = (chatMessageText: string) => {
+        socket.emit('send-message', chatMessageText)
+    }
+
+
+    const onConnect = () => {
+        // setIsConnected(true)
+        // setTransportName(socket.io.engine.transport.name)
+
+        // socket.io.engine.on("upgrade", (transport) => {
+        //     setTransportName(transport.name)
+        // })
+    }
+
+    const onDisconnect = () => {
+        // setIsConnected(false)
+        // setTransportName(null)
+    }
+
+    const receiveMessage = (msg: string) => {
+
+        // console.log(`Received message : ${msg}`)
+        appendToChatMessageList({
+            text: msg,
+            to: 2,
+            from: 1,
+        })
     }
 
     React.useEffect(() => {
-        setChatHistoryTextAreaValue(sessionStorage.getItem('chat-history') || "")
-
-        const onConnect = () => {
-            setIsConnected(true)
-            setTransportName(socket.io.engine.transport.name)
-
-            socket.io.engine.on("upgrade", (transport) => {
-                setTransportName(transport.name)
-            })
-        }
-
-        const onDisconnect = () => {
-            setIsConnected(false)
-            setTransportName(null)
-        }
-
-        const receiveMessage = (msg: string) => {
-            const currentValue = chatHistoryTextAreaValue
-            setChatHistoryTextAreaValue(currentValue + " " + msg)
-            sessionStorage.setItem('chat-history', chatHistoryTextAreaValue)
-        }
 
         if (socket.connected) {
             onConnect()
+        } else {
+            socket.connect()
         }
 
         socket.on("connect", onConnect)
@@ -68,42 +171,16 @@ export default function Home() {
     }, [])
 
     return (
-        <main className="h-full w-screen">
-            <div className="">
-                <div>
-                    Messages
-                </div>
-                <textarea
-                    rows={5}
-                    cols={50}
-                    className="outline-blue-500 border-gray-400 border-2 p-3 rounded-2xl"
-                    value={chatHistoryTextAreaValue}
-                    readOnly={true}
-                />
+        <main className="h-screen w-screen flex flex-row p-5">
+            <div className="w-[calc(30vw)] h-full bg-yellow-100/50">
             </div>
-            <form
-                className=""
-                onSubmit={handleSendMessage}
-            >
-                <div className="flex flex-row gap-2">
-                    <textarea
-                        rows={1}
-                        cols={50}
-                        className="outline-blue-500 border-gray-400 border-2 p-3 rounded-2xl"
-                        value={composeMessageTextAreaValue}
-                        onChange={handleComposeMessageTextAreaValueChange}
-                    />
-                    <button type="submit" className="">
-                        <IoMdSend
-                            className="w-5 h-5  border-2 border-gray-500"
-                        />
-                    </button>
-                </div>
-            </form>
-            <div className="">
-                <p>Status : {isConnected ? "connected" : "disconnected"} </p>
-                <p>Transport : {transportName !== null ? transportName : "N/A"} </p>
-            </div>
+            <ChatArea chatMessageList={chatMessageList} sendMessage={sendMessage} />
+            {
+                // <div className="">
+                //     <p>Status : {isConnected ? "connected" : "disconnected"} </p>
+                //     <p>Transport : {transportName !== null ? transportName : "N/A"} </p>
+                // </div>
+            }
 
         </main>
 
