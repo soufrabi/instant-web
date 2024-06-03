@@ -90,7 +90,7 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
             </div>
             <div className="flex flex-row items-center gap-2 px-4 py-3">
                 <textarea
-                    className="flex-1 bg-orange-50 rounded-2xl p-3 outline-yellow-600"
+                    className="flex-1 bg-orange-50 rounded-2xl p-3 outline-yellow-600 resize-none"
                     value={composeMessageTextAreaValue}
                     onChange={handleComposeMessageTextAreaValueChange}
                     onKeyDown={handleComposeMessageKeyDown}
