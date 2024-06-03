@@ -1,30 +1,75 @@
 "use client"
 
 import React from "react"
+import { IoMdSend } from "react-icons/io";
 import { socket } from "@/socket"
+
 
 
 export default function Home() {
     const [isConnected, setIsConnected] = React.useState<boolean>(false)
-    const [textAreaValue, setTextAreaValue] = React.useState<string>("")
-    const handleTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setTextAreaValue(ev.target.value)
+    const [transportName, setTransportName] = React.useState<any | null>(null)
+    const [chatHistoryTextAreaValue, setChatHistoryTextAreaValue] = React.useState<string>("")
+    const [composeMessageTextAreaValue, setComposeMessageTextAreaValue] = React.useState<string>("")
+
+
+    const handleComposeMessageTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setComposeMessageTextAreaValue(ev.target.value)
     }
 
-    const socketInitializer = async () => {
-        // await fetch('/api/socket')
-        socket.on('connect',()=>{
-            console.log('Websocket Connected')
-        })
+    const handleSendMessage = (ev: React.FormEvent<HTMLFormElement>) => {
+        ev.preventDefault()
+
+        socket.emit('send-message', composeMessageTextAreaValue)
+
     }
 
     React.useEffect(() => {
+        setChatHistoryTextAreaValue(sessionStorage.getItem('chat-history') || "")
+
+        const onConnect = () => {
+            setIsConnected(true)
+            setTransportName(socket.io.engine.transport.name)
+
+            socket.io.engine.on("upgrade", (transport) => {
+                setTransportName(transport.name)
+            })
+        }
+
+        const onDisconnect = () => {
+            setIsConnected(false)
+            setTransportName(null)
+        }
+
+        const receiveMessage = (msg: string) => {
+            const currentValue = chatHistoryTextAreaValue
+            setChatHistoryTextAreaValue(currentValue + " " + msg)
+            sessionStorage.setItem('chat-history', chatHistoryTextAreaValue)
+        }
+
+        if (socket.connected) {
+            onConnect()
+        }
+
+        socket.on("connect", onConnect)
+        socket.on("disconnect", onDisconnect)
+
+        socket.on('receive-message', receiveMessage)
+
+        return () => {
+            socket.off("connect", onConnect)
+            socket.off("disconnect", onDisconnect)
+
+            socket.off("receive-message", receiveMessage)
+
+            // socket.disconnect()
+        }
 
     }, [])
 
     return (
         <main className="h-full w-screen">
-            <div className="flex flex-col items-center">
+            <div className="">
                 <div>
                     Messages
                 </div>
@@ -32,9 +77,32 @@ export default function Home() {
                     rows={5}
                     cols={50}
                     className="outline-blue-500 border-gray-400 border-2 p-3 rounded-2xl"
-                    value={textAreaValue}
-                    onChange={handleTextAreaValueChange}
+                    value={chatHistoryTextAreaValue}
+                    readOnly={true}
                 />
+            </div>
+            <form
+                className=""
+                onSubmit={handleSendMessage}
+            >
+                <div className="flex flex-row gap-2">
+                    <textarea
+                        rows={1}
+                        cols={50}
+                        className="outline-blue-500 border-gray-400 border-2 p-3 rounded-2xl"
+                        value={composeMessageTextAreaValue}
+                        onChange={handleComposeMessageTextAreaValueChange}
+                    />
+                    <button type="submit" className="">
+                        <IoMdSend
+                            className="w-5 h-5  border-2 border-gray-500"
+                        />
+                    </button>
+                </div>
+            </form>
+            <div className="">
+                <p>Status : {isConnected ? "connected" : "disconnected"} </p>
+                <p>Transport : {transportName !== null ? transportName : "N/A"} </p>
             </div>
 
         </main>
