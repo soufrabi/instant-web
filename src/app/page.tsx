@@ -314,7 +314,11 @@ export default function Home() {
     }
 
     const sendMessage = (chatMessageText: string) => {
-        socket.emit('send-message', chatMessageText, currentRoomNumber)
+        if (isInRoom) {
+            socket.emit('send-message', chatMessageText, currentRoomNumber)
+        } else {
+            // console.error("Cannot send message as user is not in any room")
+        }
     }
 
 
