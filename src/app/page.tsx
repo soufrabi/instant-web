@@ -7,18 +7,20 @@ import { BsChatLeftText } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
 import { HiDotsVertical } from "react-icons/hi";
+import { IoIosLock } from "react-icons/io";
 import { nanoid } from "nanoid";
 import Markdown from "react-markdown";
-import { Switch } from "@headlessui/react";
+import { Button, Field, Fieldset, Input, Label, Switch } from "@headlessui/react";
 import { socket } from "@/socket"
 
 type ChatMessageData = {
     text: string,
-    from: number,
-    to: number,
+    from: string,
+    to: string,
 }
 
 type ChatAreaProps = {
+    myUserId: string,
     chatMessageList: Array<ChatMessageData>,
     sendMessage: (chatMessageText: string) => void,
 }
@@ -28,20 +30,6 @@ enum AppMode {
     SETTINGS,
 }
 
-const myID: number = 1
-const initialChatMessageList: Array<ChatMessageData> = [
-    {
-        text: "Hello",
-        from: 1,
-        to: 2,
-    },
-    {
-        text: "I am fine",
-        from: 2,
-        to: 1
-    }
-
-]
 
 type LeftSmallSideBarProps = {
     appMode: AppMode,
@@ -89,7 +77,7 @@ function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps) {
     )
 }
 
-function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
+function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
     const chatListBottomRef = React.useRef<HTMLDivElement>(null)
     const [composeMessageTextAreaValue, setComposeMessageTextAreaValue] = React.useState<string>("")
     const handleComposeMessageTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -138,7 +126,7 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
                     chatMessageList.map((chatMessage: ChatMessageData) => (
                         <div
                             key={nanoid()}
-                            className={`flex flex-row ${chatMessage.from === myID ? "justify-end" : "justify-start"}`}
+                            className={`flex flex-row ${chatMessage.from === myUserId ? "justify-end" : "justify-start"}`}
                         >
                             <div className="p-3 rounded-2xl bg-teal-200">
                                 <Markdown>
@@ -183,25 +171,26 @@ function ChatArea({ chatMessageList, sendMessage }: ChatAreaProps) {
 }
 
 type AnonChatSideBarProps = {
-    currentRoomNumber: string,
+    currentRoomId: string,
     isInRoom: boolean,
     joinRoom: (room: string) => void,
+    leaveRoom: () => void,
 }
 
-function AnonChatSideBar({ currentRoomNumber, isInRoom, joinRoom }: AnonChatSideBarProps) {
-    const [roomNumber, setRoomNumber] = React.useState<string>("")
+function AnonChatSideBar({ currentRoomId, isInRoom, joinRoom, leaveRoom }: AnonChatSideBarProps) {
+    const [roomId, setRoomId] = React.useState<string>("")
     const [password, setPassword] = React.useState<string>("")
     const statusMessage = React.useMemo<string>(() => {
         if (isInRoom) {
-            return `Currently in Room No. ${currentRoomNumber} `
+            return `Status : Currently in Room ID ${currentRoomId} `
         } else {
-            return "Please join a room"
+            return "Status : Currently not in any room"
         }
 
-    }, [currentRoomNumber, isInRoom])
+    }, [currentRoomId, isInRoom])
 
-    const handleRoomNumberChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
-        setRoomNumber(ev.target.value)
+    const handleRoomIdChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+        setRoomId(ev.target.value)
     }
 
     const handlePasswordChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,7 +198,11 @@ function AnonChatSideBar({ currentRoomNumber, isInRoom, joinRoom }: AnonChatSide
     }
 
     const handleJoinRoomButtonClick = () => {
-        joinRoom(roomNumber)
+        joinRoom(roomId)
+    }
+
+    const handleLeaveRoomButtonClick = () => {
+        leaveRoom()
     }
 
     return (
@@ -226,41 +219,62 @@ function AnonChatSideBar({ currentRoomNumber, isInRoom, joinRoom }: AnonChatSide
 
             </div>
 
-            <div className="flex flex-row gap-2 px-4 py-2">
-                <span
-                >Room No&nbsp;</span>
-                <input
-                    type="text"
-                    className="border-gray-300 outline-none border-2 px-1"
-                    value={roomNumber}
-                    onChange={handleRoomNumberChange}
-                />
-            </div>
-            <div className="flex flex-row gap-2 px-4 py-2">
-                <span
-                >Password</span>
-                <input
-                    type="password"
-                    className="border-gray-300 outline-none border-2 px-1"
-                    value={password}
-                    onChange={handlePasswordChange}
-                />
-            </div>
-            <div className="flex flex-row gap-2 px-4 py-2">
-                <button
-                    className="bg-green-200 p-2 rounded-md"
-                    onClick={handleJoinRoomButtonClick}
-                >
-                    <span
-                    >Join</span>
-                </button>
+            <Fieldset className={"w-full px-4"}>
                 {
-                    // <button className="text-gray-800 bg-green-200 p-2 rounded-md">
-                    //     <span
-                    //     >Create</span>
-                    // </button>
+                    // <Legend
+                    //     className={"text-lg font-semibold"}
+                    // >Room</Legend>
+                    //
                 }
-            </div>
+                <Field
+                    className={"py-1 flex flex-col gap-1"}
+                >
+                    <Label
+                        className={"block"}
+                    >
+                        <span>Room ID</span>
+                    </Label>
+                    <Input
+                        name="roomId"
+                        className={"block outline-none border-2 border-gray-200 w-full px-2"}
+                        value={roomId}
+                        onChange={handleRoomIdChange}
+                    />
+                </Field>
+                <Field
+                    className={"py-1 flex flex-col gap-1"}
+                >
+                    <Label
+                        className={"block"}
+                    >
+                        <span>Password</span>
+                    </Label>
+                    <Input
+                        name="password"
+                        type="password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        className={"block outline-none border-2 border-gray-200 w-full px-2"}
+                    />
+
+                </Field>
+                <Field
+                    className={"py-1 flex flex-row gap-3"}
+                >
+                    <Button
+                        className={"bg-green-200 p-2 rounded-md"}
+                        onClick={handleJoinRoomButtonClick}
+                    >
+                        <span>Join</span>
+                    </Button>
+                    <Button
+                        className={"bg-green-200 p-2 rounded-md"}
+                        onClick={handleLeaveRoomButtonClick}
+                    >
+                        <span>Leave</span>
+                    </Button>
+                </Field>
+            </Fieldset>
             <div className="flex flex-row px-4 py-4">
                 <span
                     className=""
@@ -271,6 +285,7 @@ function AnonChatSideBar({ currentRoomNumber, isInRoom, joinRoom }: AnonChatSide
     )
 
 }
+
 
 function SettingsSideBar() {
     const [enabled, setEnabled] = React.useState<boolean>(false)
@@ -301,13 +316,49 @@ function SettingsSideBar() {
 
 }
 
+
+function NoAccessScreen() {
+    return (
+        <div
+            className="h-full w-full relative overflow-clip"
+            style={{
+                backgroundImage: 'url("")'
+            }}
+        >
+            <div
+                className={`absolute top-0 left-0 h-full w-full bg-[url("/dark-screen-chat-template-interface-with-chat.jpg")] bg-cover bg-center blur-md `}
+            >
+
+            </div>
+            <div className="absolute flex flex-col justify-center items-center w-full h-full">
+                <div className="">
+                    <IoIosLock
+                        className="w-20 h-20 text-green-300"
+
+                    />
+                </div>
+                <div className="">
+                    <span
+                        className="text-3xl text-white select-none"
+                    >Please join a room to send messages</span>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export default function Home() {
     // const [isConnected, setIsConnected] = React.useState<boolean>(false)
     // const [transportName, setTransportName] = React.useState<any | null>(null)
-    const [chatMessageList, setChatMessageList] = React.useState<Array<ChatMessageData>>(initialChatMessageList)
+    const [chatMessageList, setChatMessageList] = React.useState<Array<ChatMessageData>>([])
     const [appMode, setAppMode] = React.useState<AppMode>(AppMode.INCOGNITO_CHAT)
-    const [currentRoomNumber, setCurrentRoomNumber] = React.useState<string>("")
+    const [currentRoomId, setCurrentRoomId] = React.useState<string>("")
     const [isInRoom, setIsInRoom] = React.useState<boolean>(false)
+    const [anonId, setAnonId] = React.useState<string | null>(null)
+
+    const clearChatMessageList = () => {
+        setChatMessageList([])
+    }
 
     const appendToChatMessageList = (newChatMessage: ChatMessageData) => {
         setChatMessageList((prevList) => [...prevList, newChatMessage])
@@ -315,7 +366,7 @@ export default function Home() {
 
     const sendMessage = (chatMessageText: string) => {
         if (isInRoom) {
-            socket.emit('send-message', chatMessageText, currentRoomNumber)
+            socket.emit('send-message', chatMessageText, currentRoomId)
         } else {
             // console.error("Cannot send message as user is not in any room")
         }
@@ -336,25 +387,36 @@ export default function Home() {
         // setTransportName(null)
     }
 
-    const receiveMessage = (msg: string) => {
+    const receiveMessage = (msg: ChatMessageData) => {
 
         // console.log(`Received message : ${msg}`)
-        appendToChatMessageList({
-            text: msg,
-            to: 2,
-            from: 1,
-        })
+        appendToChatMessageList(msg)
     }
 
-    const joinRoom = (roomNumber: string) => {
+    const joinRoom = (roomIdPassed: string) => {
 
-        const roomNumberTrimmed = roomNumber.trim()
-        if (roomNumberTrimmed.length > 0) {
-            socket.emit('join-room', roomNumberTrimmed, () => {
-                setIsInRoom(true)
-                setCurrentRoomNumber(roomNumber)
+        const roomIdTrimmed = roomIdPassed.trim()
+        if (roomIdTrimmed.length > 0) {
+            socket.emit('join-room', roomIdTrimmed, (responseStatusCode: number, anonId: string) => {
+                if (responseStatusCode === 0) {
+                    setIsInRoom(true)
+                    setCurrentRoomId(roomIdTrimmed)
+                    setAnonId(anonId)
+                }
             })
         }
+    }
+
+    const leaveRoom = () => {
+
+        socket.emit('leave-room', (responseStatusCode: number) => {
+            if (responseStatusCode === 0) {
+                setIsInRoom(false)
+                setCurrentRoomId("")
+                clearChatMessageList()
+            }
+        })
+
     }
 
 
@@ -390,13 +452,24 @@ export default function Home() {
             <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
 
             {
-                appMode === AppMode.INCOGNITO_CHAT && <AnonChatSideBar currentRoomNumber={currentRoomNumber} isInRoom={isInRoom} joinRoom={joinRoom} />
+                appMode === AppMode.INCOGNITO_CHAT
+                && <AnonChatSideBar
+                    currentRoomId={currentRoomId}
+                    isInRoom={isInRoom}
+                    joinRoom={joinRoom}
+                    leaveRoom={leaveRoom}
+                />
             }
             {
                 appMode === AppMode.SETTINGS && <SettingsSideBar />
             }
 
-            <ChatArea chatMessageList={chatMessageList} sendMessage={sendMessage} />
+            {
+                isInRoom && anonId !== null
+                    ? <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} />
+                    : <NoAccessScreen />
+            }
+
             {
                 // <div className="">
                 //     <p>Status : {isConnected ? "connected" : "disconnected"} </p>
