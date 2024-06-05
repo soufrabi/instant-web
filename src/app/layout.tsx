@@ -7,6 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Instant",
   description: "Your Messaging App",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
