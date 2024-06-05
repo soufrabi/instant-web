@@ -113,6 +113,14 @@ function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
 
     }
 
+    const modifyTextBeforeDisplay = (text: string): string => {
+        // const newLineRegex:RegExp = /[\r\n]+/g
+        const newLineRegex: RegExp = /\s*([\r\n]+)/g
+        const newText = text.replace(newLineRegex, "  \n")
+        // console.log("New Text : ", newText)
+        return newText
+    }
+
     React.useEffect(() => {
         scrollToBottomOfChatList()
     }, [chatMessageList])
@@ -130,7 +138,7 @@ function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
                         >
                             <div className="p-3 rounded-2xl bg-teal-200">
                                 <Markdown>
-                                    {chatMessage.text}
+                                    {modifyTextBeforeDisplay(chatMessage.text)}
                                 </Markdown>
                             </div>
 
