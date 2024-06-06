@@ -440,10 +440,6 @@ function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoom }: In
         }
     }
 
-    const handleLeaveRoomButtonClick = () => {
-        leaveRoom()
-
-    }
 
     return (
         <div className="h-full w-full bg-white shadow-md">
@@ -478,12 +474,6 @@ function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoom }: In
                         onClick={handleJoinRoomButtonClick}
                     >
                         <span>Join</span>
-                    </Button>
-                    <Button
-                        className={"bg-green-200 p-2 rounded-md"}
-                        onClick={handleLeaveRoomButtonClick}
-                    >
-                        <span>Leave</span>
                     </Button>
                 </Field>
 
