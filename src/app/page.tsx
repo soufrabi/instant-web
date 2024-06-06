@@ -8,10 +8,13 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { CgProfile } from "react-icons/cg";
 import { HiDotsVertical } from "react-icons/hi";
 import { IoIosLock } from "react-icons/io";
+import { IoCallOutline } from "react-icons/io5";
+import { HiOutlineUserGroup } from "react-icons/hi2";
 import { nanoid } from "nanoid";
 import Markdown from "react-markdown";
 import { Button, Field, Fieldset, Input, Label, Switch } from "@headlessui/react";
 import { socket } from "@/socket"
+import { MediaContextProvider, Media } from "@/app/components/media"
 
 type ChatMessageData = {
     text: string,
@@ -373,12 +376,88 @@ function NoAccessScreen() {
                 </div>
                 <div className="">
                     <span
-                        className="text-3xl text-white select-none"
+                        className="text-md sm:text-xl md:text-2xl lg:text-3xl text-white select-none"
                     >Please join a room to send messages</span>
                 </div>
             </div>
         </div>
     )
+}
+
+function TopNavBar() {
+    return (
+        <div
+            className="flex flex-row h-12 bg-white justify-between items-center"
+        >
+            <div className="px-4 py-2">
+                <span
+                    className="text-2xl font-serif"
+                >Instant</span>
+            </div>
+            <div className="px-2 py-2">
+                <HiDotsVertical
+
+                    className="w-6 h-6"
+                />
+            </div>
+
+        </div>
+    )
+}
+
+function BottomNavBar() {
+
+    return (
+        <div
+            className="flex flex-row justify-around pb-2 pt-3 bg-white"
+        >
+            <div
+                className="cursor-pointer flex flex-col justify-center items-center"
+            >
+                <BsChatLeftText
+                    className="w-8 h-8"
+                />
+                <span
+                    className="text-sm"
+                >Chats</span>
+
+            </div>
+            <div
+                className="cursor-pointer flex flex-col justify-center items-center"
+            >
+                <HiOutlineUserGroup
+                    className="w-8 h-8"
+                />
+                <span
+                    className="text-sm"
+                >Communities</span>
+
+            </div>
+            <div
+                className="cursor-pointer flex flex-col  justify-center items-center"
+            >
+                <IoCallOutline
+                    className="w-8 h-8"
+                />
+                <span
+                    className="text-sm"
+                >Calls</span>
+
+            </div>
+            <div
+                className="cursor-pointer flex flex-col justify-center items-center"
+            >
+                <BsIncognito
+                    className="w-8 h-8"
+                />
+                <span
+                    className="text-sm"
+                >Incognito</span>
+
+            </div>
+        </div>
+    )
+
 }
 
 export default function Home() {
@@ -481,37 +560,44 @@ export default function Home() {
     }, [])
 
     return (
-        <main className="h-screen w-screen flex flex-row p-5 bg-slate-300">
+        <MediaContextProvider>
+            <main className="h-[100svh] w-screen flex flex-col md:flex-row md:p-2 lg:p-4 bg-slate-300">
+                <Media lessThan="md">
+                    <TopNavBar />
+                </Media>
 
-            <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
+                <Media greaterThanOrEqual="md"
+                    className="flex flex-row"
+                >
+                    <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
 
-            {
-                appMode === AppMode.INCOGNITO_CHAT
-                && <AnonChatSideBar
-                    currentRoomId={currentRoomId}
-                    isInRoom={isInRoom}
-                    joinRoom={joinRoom}
-                    leaveRoom={leaveRoom}
-                />
-            }
-            {
-                appMode === AppMode.SETTINGS && <SettingsSideBar />
-            }
+                    {
+                        appMode === AppMode.INCOGNITO_CHAT
+                        && <AnonChatSideBar
+                            currentRoomId={currentRoomId}
+                            isInRoom={isInRoom}
+                            joinRoom={joinRoom}
+                            leaveRoom={leaveRoom}
+                        />
+                    }
+                    {
+                        appMode === AppMode.SETTINGS && <SettingsSideBar />
+                    }
+                </Media>
 
-            {
-                isInRoom && anonId !== null
-                    ? <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} />
-                    : <NoAccessScreen />
-            }
+                {
+                    isInRoom && anonId !== null
+                        ? <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} />
+                        : <NoAccessScreen />
+                }
 
-            {
-                // <div className="">
-                //     <p>Status : {isConnected ? "connected" : "disconnected"} </p>
-                //     <p>Transport : {transportName !== null ? transportName : "N/A"} </p>
-                // </div>
-            }
+                <Media lessThan="md">
+                    <BottomNavBar />
+                </Media>
 
-        </main >
+
+            </main >
+        </MediaContextProvider>
 
 
     )
