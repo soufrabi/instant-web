@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { IoMdSend } from "react-icons/io";
+import { IoMdExit, IoMdSend } from "react-icons/io";
 import { BsIncognito } from "react-icons/bs";
 import { BsChatLeftText } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -43,6 +43,11 @@ enum AppMode {
 type LeftSmallSideBarProps = {
     appMode: AppMode,
     setAppMode: React.Dispatch<React.SetStateAction<AppMode>>,
+}
+
+type TopNavBarProps = {
+    showLeaveRoomButton: boolean,
+    leaveRoom: () => void,
 }
 
 type BottomNavBarProps = LeftSmallSideBarProps
@@ -467,21 +472,47 @@ function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoom }: In
     )
 }
 
-function TopNavBar() {
+function TopNavBar({ showLeaveRoomButton, leaveRoom }: TopNavBarProps) {
+    const handleLeaveRoomButtonClick = () => {
+        leaveRoom()
+    }
     return (
         <div
             className="flex flex-row h-12 bg-white justify-between items-center"
         >
-            <div className="px-4 py-2">
+            <div
+                className="px-4 py-2"
+            >
                 <span
                     className="text-2xl font-serif"
                 >Instant</span>
             </div>
-            <div className="px-2 py-2">
-                <HiDotsVertical
+            <div
+                className="flex flex-row"
+            >
+                <div className="flex flex-row justify-center items-center">
+                    {showLeaveRoomButton &&
+                        <div
+                            className="px-2 py-2 flex flex-row gap-2 justify-center items-center"
+                            onClick={handleLeaveRoomButtonClick}
+                        >
+                            <span>
+                                Leave Room
+                            </span>
+                            <IoMdExit
+                                className="w-6 h-6"
+                            />
+                        </div>
+                    }
+                </div>
+                <div
+                    className="px-2 py-2"
+                >
+                    <HiDotsVertical
 
-                    className="w-6 h-6"
-                />
+                        className="w-6 h-6"
+                    />
+                </div>
             </div>
 
         </div>
@@ -755,7 +786,10 @@ export default function Home() {
                 <Media lessThan="md"
                     className="h-full w-full flex flex-col md:hidden"
                 >
-                    <TopNavBar />
+                    <TopNavBar
+                        showLeaveRoomButton={appMode === AppMode.INCOGNITO_CHAT && (isInRoom && anonId != null)}
+                        leaveRoom={leaveRoom}
+                    />
                     {
                         appMode === AppMode.INCOGNITO_CHAT && (isInRoom && anonId != null) &&
                         <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} maxLineSize={30} mobileDisplay={true} />
