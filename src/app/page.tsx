@@ -10,9 +10,10 @@ import { HiDotsVertical } from "react-icons/hi";
 import { IoIosLock } from "react-icons/io";
 import { IoCallOutline } from "react-icons/io5";
 import { HiOutlineUserGroup } from "react-icons/hi2";
-import { nanoid } from "nanoid";
 import Markdown from "react-markdown";
-import { Button, Field, Fieldset, Input, Label, Switch } from "@headlessui/react";
+import { Button, Field, Fieldset, Input, Label, Legend, Switch } from "@headlessui/react";
+import { nanoid } from "nanoid";
+import clsx from "clsx";
 import { socket } from "@/socket"
 import { MediaContextProvider, Media } from "@/app/components/media"
 
@@ -26,9 +27,14 @@ type ChatAreaProps = {
     myUserId: string,
     chatMessageList: Array<ChatMessageData>,
     sendMessage: (chatMessageText: string) => void,
+    maxLineSize: number,
+    mobileDisplay: boolean,
 }
 
 enum AppMode {
+    CHAT,
+    COMMUNITY,
+    CALLS,
     INCOGNITO_CHAT,
     SETTINGS,
 }
@@ -39,8 +45,10 @@ type LeftSmallSideBarProps = {
     setAppMode: React.Dispatch<React.SetStateAction<AppMode>>,
 }
 
+type BottomNavBarProps = LeftSmallSideBarProps
+type IncognitoChatLobbyProps = AnonChatSideBarProps
+
 const MAX_MESSAGE_LENGTH: number = 2000
-const MAX_LINE_SIZE: number = 80
 
 function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps) {
     return (
@@ -83,7 +91,7 @@ function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps) {
     )
 }
 
-function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
+function ChatArea({ myUserId, chatMessageList, sendMessage, maxLineSize, mobileDisplay }: ChatAreaProps) {
     const chatListBottomRef = React.useRef<HTMLDivElement>(null)
     const [composeMessageTextAreaValue, setComposeMessageTextAreaValue] = React.useState<string>("")
     const handleComposeMessageTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -125,8 +133,8 @@ function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
         let currentLine: string = ""
 
         for (const ch of text) {
-            console.log(ch)
-            if (ch === '\n' || ch === '\r' || currentLine.length + 1 > MAX_LINE_SIZE) {
+            // console.log(ch)
+            if (ch === '\n' || ch === '\r' || currentLine.length + 1 > maxLineSize) {
                 lines.push(currentLine)
                 currentLine = ""
                 currentLine += ch
@@ -154,7 +162,11 @@ function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
     }, [chatMessageList])
 
     return (
-        <div className="h-full w-full bg-sky-50 flex flex-col">
+        <div
+            className={clsx("w-full bg-sky-50 flex flex-col h-full",
+                { "max-h-[calc(100svh-7.5rem)]": mobileDisplay }
+            )}
+        >
             <div
                 className="flex-1 flex flex-col gap-2 px-2 py-2 overflow-auto"
             >
@@ -384,6 +396,77 @@ function NoAccessScreen() {
     )
 }
 
+// for mobile devices
+function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoom }: IncognitoChatLobbyProps) {
+    const [roomId, setRoomId] = React.useState<string>("")
+    const handleRoomIdChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+        setRoomId(ev.target.value)
+    }
+
+    const handleJoinRoomButtonClick = () => {
+        const roomIdTrimmed = roomId.trim()
+        if (roomIdTrimmed.length > 0) {
+            joinRoom(roomIdTrimmed)
+        }
+    }
+
+    const handleLeaveRoomButtonClick = () => {
+        leaveRoom()
+
+    }
+
+    return (
+        <div className="h-full w-full bg-white shadow-md">
+
+            <Fieldset className={"h-full w-full p-4"}>
+                <Legend >
+                    <span
+                        className="text-xl font-semibold"
+                    >Incognito Chat Lobby</span>
+                </Legend>
+                <Field className="py-1 flex flex-col gap-1">
+                    <Label
+                        className={"block"}
+                    >
+                        <span
+                            className=""
+                        >Room ID</span>
+                    </Label>
+                    <Input
+                        type="text"
+                        className={"block outline-none border-2 border-gray-200 w-full px-2"}
+                        value={roomId}
+                        onChange={handleRoomIdChange}
+                    />
+
+                </Field>
+                <Field
+                    className={"py-1 flex flex-row gap-3"}
+                >
+                    <Button
+                        className={"bg-green-200 p-2 rounded-md"}
+                        onClick={handleJoinRoomButtonClick}
+                    >
+                        <span>Join</span>
+                    </Button>
+                    <Button
+                        className={"bg-green-200 p-2 rounded-md"}
+                        onClick={handleLeaveRoomButtonClick}
+                    >
+                        <span>Leave</span>
+                    </Button>
+                </Field>
+
+
+
+            </Fieldset>
+
+
+
+        </div>
+    )
+}
+
 function TopNavBar() {
     return (
         <div
@@ -405,53 +488,131 @@ function TopNavBar() {
     )
 }
 
-function BottomNavBar() {
+
+function BottomNavBar({ appMode, setAppMode }: BottomNavBarProps) {
+
+    const handleChatsIconClick = () => {
+        setAppMode(AppMode.CHAT)
+
+    }
+
+    const handleCommunitiesIconClick = () => {
+        setAppMode(AppMode.COMMUNITY)
+    }
+
+    const handleCallsIconClick = () => {
+        setAppMode(AppMode.CALLS)
+    }
+
+    const handleIncognitoIconClick = () => {
+        setAppMode(AppMode.INCOGNITO_CHAT)
+    }
 
     return (
         <div
-            className="flex flex-row justify-around pb-2 pt-3 bg-white"
+            className="h-18 flex flex-row justify-around pb-1 pt-2 bg-white"
         >
             <div
                 className="cursor-pointer flex flex-col justify-center items-center"
+                onClick={handleChatsIconClick}
             >
-                <BsChatLeftText
-                    className="w-8 h-8"
-                />
+                <div
+                    className={
+                        clsx("px-4 py-1",
+                            {
+                                "shadow-customhovereffect": appMode == AppMode.CHAT
+                            },
+                        )
+                    }
+                >
+                    <BsChatLeftText
+                        className="w-8 h-8"
+                    />
+                </div>
                 <span
-                    className="text-sm"
+                    className={clsx("text-sm",
+                        {
+                            "font-semibold": appMode === AppMode.CHAT
+                        },
+                    )}
                 >Chats</span>
 
             </div>
             <div
                 className="cursor-pointer flex flex-col justify-center items-center"
+                onClick={handleCommunitiesIconClick}
             >
-                <HiOutlineUserGroup
-                    className="w-8 h-8"
-                />
+                <div
+                    className={
+                        clsx("px-4 py-1",
+                            {
+                                "shadow-customhovereffect": appMode == AppMode.COMMUNITY
+                            },
+                        )
+                    }
+                >
+                    <HiOutlineUserGroup
+                        className="w-8 h-8"
+                    />
+                </div>
                 <span
-                    className="text-sm"
+                    className={clsx("text-sm",
+                        {
+                            "font-semibold": appMode === AppMode.COMMUNITY
+                        },
+                    )}
                 >Communities</span>
 
             </div>
             <div
                 className="cursor-pointer flex flex-col  justify-center items-center"
+                onClick={handleCallsIconClick}
             >
-                <IoCallOutline
-                    className="w-8 h-8"
-                />
+                <div
+                    className={
+                        clsx("px-4 py-1",
+                            {
+                                "shadow-customhovereffect": appMode == AppMode.CALLS
+                            },
+                        )
+                    }
+                >
+                    <IoCallOutline
+                        className="w-8 h-8"
+                    />
+                </div>
                 <span
-                    className="text-sm"
+                    className={clsx("text-sm",
+                        {
+                            "font-semibold": appMode === AppMode.CALLS
+                        },
+                    )}
                 >Calls</span>
 
             </div>
             <div
                 className="cursor-pointer flex flex-col justify-center items-center"
+                onClick={handleIncognitoIconClick}
             >
-                <BsIncognito
-                    className="w-8 h-8"
-                />
+                <div
+                    className={
+                        clsx("px-4 py-1",
+                            {
+                                "shadow-customhovereffect": appMode == AppMode.INCOGNITO_CHAT
+                            },
+                        )
+                    }
+                >
+                    <BsIncognito
+                        className="w-8 h-8"
+                    />
+                </div>
                 <span
-                    className="text-sm"
+                    className={clsx("text-sm",
+                        {
+                            "font-bold": appMode === AppMode.INCOGNITO_CHAT
+                        },
+                    )}
                 >Incognito</span>
 
             </div>
@@ -559,15 +720,16 @@ export default function Home() {
 
     }, [])
 
+    React.useEffect(() => {
+        document.body.style.overflow = "hidden"
+    }, [])
+
     return (
         <MediaContextProvider>
             <main className="h-[100svh] w-screen flex flex-col md:flex-row md:p-2 lg:p-4 bg-slate-300">
-                <Media lessThan="md">
-                    <TopNavBar />
-                </Media>
 
                 <Media greaterThanOrEqual="md"
-                    className="flex flex-row"
+                    className="hidden md:h-full md:w-full md:flex md:flex-row"
                 >
                     <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
 
@@ -583,16 +745,38 @@ export default function Home() {
                     {
                         appMode === AppMode.SETTINGS && <SettingsSideBar />
                     }
+                    {
+                        isInRoom && anonId !== null
+                            ? <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} maxLineSize={80} mobileDisplay={false} />
+                            : <NoAccessScreen />
+                    }
                 </Media>
 
-                {
-                    isInRoom && anonId !== null
-                        ? <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} />
-                        : <NoAccessScreen />
-                }
+                <Media lessThan="md"
+                    className="h-full w-full flex flex-col md:hidden"
+                >
+                    <TopNavBar />
+                    {
+                        appMode === AppMode.INCOGNITO_CHAT && (isInRoom && anonId != null) &&
+                        <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} maxLineSize={30} mobileDisplay={true} />
+                    }
+                    {
+                        appMode === AppMode.INCOGNITO_CHAT && !(isInRoom && anonId != null) &&
+                        <IncognitoChatLobby
+                            currentRoomId={currentRoomId}
+                            isInRoom={isInRoom}
+                            joinRoom={joinRoom}
+                            leaveRoom={leaveRoom}
 
-                <Media lessThan="md">
-                    <BottomNavBar />
+                        />
+                    }
+                    {
+                        appMode !== AppMode.INCOGNITO_CHAT && <NoAccessScreen />
+                    }
+                    <BottomNavBar
+                        appMode={appMode}
+                        setAppMode={setAppMode}
+                    />
                 </Media>
 
 
