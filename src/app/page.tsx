@@ -36,6 +36,9 @@ type LeftSmallSideBarProps = {
     setAppMode: React.Dispatch<React.SetStateAction<AppMode>>,
 }
 
+const MAX_MESSAGE_LENGTH: number = 2000
+const MAX_LINE_SIZE: number = 80
+
 function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps) {
     return (
 
@@ -114,11 +117,33 @@ function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
     }
 
     const modifyTextBeforeDisplay = (text: string): string => {
-        // const newLineRegex:RegExp = /[\r\n]+/g
-        const newLineRegex: RegExp = /\s*([\r\n]+)/g
-        const newText = text.replace(newLineRegex, "  \n")
-        // console.log("New Text : ", newText)
-        return newText
+        const whiteSpaceFollowedByNewLineRegex: RegExp = /\s*([\r\n]+)/g
+        const lines: string[] = []
+        let currentLine: string = ""
+
+        for (const ch of text) {
+            console.log(ch)
+            if (ch === '\n' || ch === '\r' || currentLine.length + 1 > MAX_LINE_SIZE) {
+                lines.push(currentLine)
+                currentLine = ""
+                currentLine += ch
+            } else {
+                currentLine += ch
+
+            }
+        }
+
+        if (currentLine.length > 0) {
+            lines.push(currentLine)
+        }
+
+        // console.log("Lines : ", lines)
+
+        text = lines.join('\n')
+        // console.log("New Text before Whitespace Fix: ", text)
+        text = text.replace(whiteSpaceFollowedByNewLineRegex, '  \n')
+        // console.log("New Text after Whitespace Fix: ", text)
+        return text
     }
 
     React.useEffect(() => {
@@ -155,6 +180,7 @@ function ChatArea({ myUserId, chatMessageList, sendMessage }: ChatAreaProps) {
                         value={composeMessageTextAreaValue}
                         onChange={handleComposeMessageTextAreaValueChange}
                         onKeyDown={handleComposeMessageKeyDown}
+                        maxLength={MAX_MESSAGE_LENGTH}
                     />
                     <button
 
