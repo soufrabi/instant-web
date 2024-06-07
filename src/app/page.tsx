@@ -53,6 +53,12 @@ type TopNavBarProps = {
 type BottomNavBarProps = LeftSmallSideBarProps
 type IncognitoChatLobbyProps = AnonChatSideBarProps
 
+type SettingsSideBarProps = {
+    isDarkModeEnabled: boolean | null,
+    setIsDarkModeEnabled: React.Dispatch<React.SetStateAction<boolean | null>>,
+    enableDarkMode: (dark: boolean) => void,
+}
+
 const MAX_MESSAGE_LENGTH: number = 2000
 
 function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps) {
@@ -366,15 +372,36 @@ function AnonChatSideBar({ currentRoomId, isInRoom, joinRoom, leaveRoom }: AnonC
 }
 
 
-function SettingsSideBar() {
-    const [enabled, setEnabled] = React.useState<boolean>(false)
+function SettingsSideBar({ isDarkModeEnabled, setIsDarkModeEnabled, enableDarkMode }: SettingsSideBarProps) {
+
+    // const [enabled, setEnabled] = React.useState<boolean>(false)
     React.useEffect(() => {
-        if (enabled) {
-            // enableDarkMode
-        } else {
-            // disableDarkMode
+        const darkModePreferenceInLocalStorage: string | null = localStorage.getItem("darkMode")
+        if (darkModePreferenceInLocalStorage) {
+
+            if (darkModePreferenceInLocalStorage === "dark") {
+                setIsDarkModeEnabled(true)
+            } else if (darkModePreferenceInLocalStorage === 'light') {
+                setIsDarkModeEnabled(false)
+            }
+
         }
-    }, [enabled])
+    }, [])
+    React.useEffect(() => {
+        // console.log("Dark Mode toggled")
+        if (isDarkModeEnabled !== null) {
+            if (isDarkModeEnabled) {
+                // enableDarkMode
+                localStorage.setItem("darkMode", "dark")
+                enableDarkMode(true)
+            } else {
+                // disableDarkMode
+                localStorage.setItem("darkMode", "light")
+                enableDarkMode(false)
+            }
+
+        }
+    }, [isDarkModeEnabled])
     return (
         <div className="w-[calc(20vw)] h-full flex flex-col bg-white">
             <div className="flex flex-row gap-2 px-4 py-4">
@@ -383,8 +410,8 @@ function SettingsSideBar() {
                     >Dark Mode</span>
                 </div>
                 <Switch
-                    checked={enabled}
-                    onChange={setEnabled}
+                    checked={isDarkModeEnabled !== null ? isDarkModeEnabled : false}
+                    onChange={setIsDarkModeEnabled}
                     className="group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600"
                 >
                     <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
@@ -675,6 +702,15 @@ export default function Home() {
     const [currentRoomId, setCurrentRoomId] = React.useState<string>("")
     const [isInRoom, setIsInRoom] = React.useState<boolean>(false)
     const [anonId, setAnonId] = React.useState<string | null>(null)
+    const [isDarkModeEnabled, setIsDarkModeEnabled] = React.useState<boolean | null>(null)
+
+    const enableDarkMode = (dark: boolean) => {
+        if (dark) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    }
 
     const clearChatMessageList = () => {
         setChatMessageList([])
@@ -789,7 +825,12 @@ export default function Home() {
                         />
                     }
                     {
-                        appMode === AppMode.SETTINGS && <SettingsSideBar />
+                        appMode === AppMode.SETTINGS
+                        && <SettingsSideBar
+                            isDarkModeEnabled={isDarkModeEnabled}
+                            setIsDarkModeEnabled={setIsDarkModeEnabled}
+                            enableDarkMode={enableDarkMode}
+                        />
                     }
                     {
                         isInRoom && anonId !== null
