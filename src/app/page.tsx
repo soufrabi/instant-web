@@ -7,12 +7,14 @@ import { LeftSmallSideBar } from "./components/LeftSmallSideBar";
 import { AppMode } from "./components/enums";
 import type { ChatMessageData } from "./components/ChatArea"
 import { ChatArea } from "./components/ChatArea";
-import { AnonChatSideBar } from "./components/AnonChatSideBar";
 import { NoAccessScreen } from "./components/NoAccessScreen";
 import { SettingsSideBar } from "./components/SettingsSideBar";
 import { IncognitoChatLobby } from "./components/IncognitoChatLobby";
 import { TopNavBar } from "./components/TopNavBar";
 import { BottomNavBar } from "./components/BottomNavBar";
+import { ChatsComponent } from "./components/ChatsComponent";
+import { CallsComponent } from "./components/CallsComponent";
+import { CommunitiesComponent } from "./components/CommunitiesComponent";
 
 
 
@@ -140,7 +142,7 @@ export default function Home() {
 
                     {
                         appMode === AppMode.INCOGNITO_CHAT
-                        && <AnonChatSideBar
+                        && <IncognitoChatLobby
                             currentRoomId={currentRoomId}
                             isInRoom={isInRoom}
                             joinRoom={joinRoom}
@@ -156,6 +158,18 @@ export default function Home() {
                         />
                     }
                     {
+                        appMode === AppMode.CHATS
+                        && <ChatsComponent />
+                    }
+                    {
+                        appMode === AppMode.CALLS
+                        && <CallsComponent />
+                    }
+                    {
+                        appMode === AppMode.COMMUNITIES
+                        && <CommunitiesComponent />
+                    }
+                    {
                         isInRoom && anonId !== null
                             ? <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} maxLineSize={80} mobileDisplay={false} />
                             : <NoAccessScreen />
@@ -167,6 +181,7 @@ export default function Home() {
                     className="h-full w-full flex flex-col md:hidden"
                 >
                     <TopNavBar
+                        appMode={appMode}
                         showLeaveRoomButton={appMode === AppMode.INCOGNITO_CHAT && (isInRoom && anonId != null)}
                         leaveRoom={leaveRoom}
                     />
@@ -185,7 +200,19 @@ export default function Home() {
                         />
                     }
                     {
-                        appMode !== AppMode.INCOGNITO_CHAT && <NoAccessScreen />
+                        appMode === AppMode.CHATS &&
+                        <ChatsComponent />
+                    }
+                    {
+                        appMode === AppMode.CALLS &&
+                        <CallsComponent />
+                    }
+                    {
+                        appMode === AppMode.COMMUNITIES &&
+                        <CommunitiesComponent />
+                    }
+                    {
+                        // (appMode === AppMode.COMMUNITIES) && <NoAccessScreen />
                     }
                     <BottomNavBar
                         appMode={appMode}

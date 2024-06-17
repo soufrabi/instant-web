@@ -1,13 +1,31 @@
 import { IoMdExit } from "react-icons/io"
 import { HiDotsVertical } from "react-icons/hi"
+import { useMemo } from "react"
+import clsx from "clsx"
+import { AppMode } from "./enums"
 
 type TopNavBarProps = {
+    appMode: AppMode
     showLeaveRoomButton: boolean,
     leaveRoom: () => void,
 }
 
 
-export function TopNavBar({ showLeaveRoomButton, leaveRoom }: TopNavBarProps) {
+export function TopNavBar({ appMode, showLeaveRoomButton, leaveRoom }: TopNavBarProps) {
+    const [topText, isBold] = useMemo(() => {
+        switch (appMode) {
+            case AppMode.CHATS:
+                return ["Instant", true]
+            case AppMode.COMMUNITIES:
+                return ["Communities", false]
+            case AppMode.CALLS:
+                return ["Calls", false]
+            case AppMode.INCOGNITO_CHAT:
+                return ["Incognito Chat", false]
+            default:
+                return ["Instant", true]
+        }
+    }, [appMode])
     const handleLeaveRoomButtonClick = () => {
         leaveRoom()
     }
@@ -19,8 +37,11 @@ export function TopNavBar({ showLeaveRoomButton, leaveRoom }: TopNavBarProps) {
                 className="px-4 py-2"
             >
                 <span
-                    className="text-2xl font-serif"
-                >Instant</span>
+                    className={clsx("text-2xl font-serif",
+                        {
+                            "font-semibold": isBold
+                        })}
+                >{topText}</span>
             </div>
             <div
                 className="flex flex-row"

@@ -41,7 +41,7 @@ export function SettingsSideBar({ isDarkModeEnabled, setIsDarkModeEnabled, enabl
         }
     }, [isDarkModeEnabled])
     return (
-        <div className="w-[calc(20vw)] h-full flex flex-col bg-white">
+        <div className="w-[calc(30vw)] h-full flex flex-col bg-white">
             <div className="flex flex-row gap-2 px-4 py-4">
                 <div>
                     <span

@@ -9,6 +9,16 @@ type IncognitoChatLobbyProps = AnonChatSideBarProps
 // for mobile devices
 export function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoom }: IncognitoChatLobbyProps) {
     const [roomId, setRoomId] = React.useState<string>("")
+    const statusMessage = React.useMemo<string>(() => {
+        if (isInRoom) {
+            return `Status : Currently in Room ID ${currentRoomId} `
+        } else {
+            return "Status : Currently not in any room"
+        }
+
+    }, [currentRoomId, isInRoom])
+
+
     const handleRoomIdChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setRoomId(ev.target.value)
     }
@@ -19,16 +29,19 @@ export function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoo
             joinRoom(roomIdTrimmed)
         }
     }
+    const handleLeaveRoomButtonClick = () => {
+        leaveRoom()
+    }
 
 
     return (
-        <div className="h-full w-full bg-white shadow-md">
+        <div className="w-full md:min-w-96 md:w-[calc(30vw)] h-full flex flex-col bg-white overflow-y-clip">
 
-            <Fieldset className={"h-full w-full p-4"}>
+            <Fieldset className={"w-full p-4"}>
                 <Legend >
                     <span
                         className="text-xl font-semibold"
-                    >Incognito Chat Lobby</span>
+                    >Incognito Chat</span>
                 </Legend>
                 <Field className="py-1 flex flex-col gap-1">
                     <Label
@@ -55,11 +68,18 @@ export function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoo
                     >
                         <span>Join</span>
                     </Button>
+                    <Button
+                        className={"bg-green-200 p-2 rounded-md"}
+                        onClick={handleLeaveRoomButtonClick}
+                    >
+                        <span>Leave</span>
+
+                    </Button>
                 </Field>
-
-
-
             </Fieldset>
+            <div className="p-4">
+                {statusMessage}
+            </div>
 
 
 
