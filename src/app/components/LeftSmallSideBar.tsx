@@ -22,7 +22,7 @@ export function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps)
                 <button
                     className={clsx("px-2 py-2 hover:shadow-customhovereffect rounded-2xl",
                     )}
-                    onClick={() => setAppMode(AppMode.CHAT)}
+                    onClick={() => setAppMode(AppMode.CHATS)}
                 >
                     <BsChatLeftText
                         className="w-6 h-6"
@@ -31,7 +31,7 @@ export function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps)
                 <button
                     className={clsx("px-2 py-2 hover:shadow-customhovereffect rounded-2xl",
                     )}
-                    onClick={() => setAppMode(AppMode.COMMUNITY)}
+                    onClick={() => setAppMode(AppMode.COMMUNITIES)}
                 >
                     <HiOutlineUserGroup
                         className="w-6 h-6"
