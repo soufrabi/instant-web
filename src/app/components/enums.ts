@@ -1,6 +1,6 @@
 export enum AppMode {
-    CHAT,
-    COMMUNITY,
+    CHATS,
+    COMMUNITIES,
     CALLS,
     INCOGNITO_CHAT,
     SETTINGS,
