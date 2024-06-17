@@ -12,12 +12,12 @@ type BottomNavBarProps = LeftSmallSideBarProps
 export function BottomNavBar({ appMode, setAppMode }: BottomNavBarProps) {
 
     const handleChatsIconClick = () => {
-        setAppMode(AppMode.CHAT)
+        setAppMode(AppMode.CHATS)
 
     }
 
     const handleCommunitiesIconClick = () => {
-        setAppMode(AppMode.COMMUNITY)
+        setAppMode(AppMode.COMMUNITIES)
     }
 
     const handleCallsIconClick = () => {
@@ -40,7 +40,7 @@ export function BottomNavBar({ appMode, setAppMode }: BottomNavBarProps) {
                     className={
                         clsx("px-4 py-1",
                             {
-                                "shadow-customhovereffect": appMode == AppMode.CHAT
+                                "shadow-customhovereffect": appMode == AppMode.CHATS
                             },
                         )
                     }
@@ -52,7 +52,7 @@ export function BottomNavBar({ appMode, setAppMode }: BottomNavBarProps) {
                 <span
                     className={clsx("text-sm",
                         {
-                            "font-semibold": appMode === AppMode.CHAT
+                            "font-semibold": appMode === AppMode.CHATS
                         },
                     )}
                 >Chats</span>
@@ -66,7 +66,7 @@ export function BottomNavBar({ appMode, setAppMode }: BottomNavBarProps) {
                     className={
                         clsx("px-4 py-1",
                             {
-                                "shadow-customhovereffect": appMode == AppMode.COMMUNITY
+                                "shadow-customhovereffect": appMode == AppMode.COMMUNITIES
                             },
                         )
                     }
@@ -78,7 +78,7 @@ export function BottomNavBar({ appMode, setAppMode }: BottomNavBarProps) {
                 <span
                     className={clsx("text-sm",
                         {
-                            "font-semibold": appMode === AppMode.COMMUNITY
+                            "font-semibold": appMode === AppMode.COMMUNITIES
                         },
                     )}
                 >Communities</span>
