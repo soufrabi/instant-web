@@ -132,7 +132,8 @@ export default function Home() {
         <MediaContextProvider>
             <main className="h-[100svh] w-screen flex flex-col md:flex-row md:p-2 lg:p-4 bg-slate-300">
 
-                <Media greaterThanOrEqual="md"
+                <Media
+                    greaterThanOrEqual="md"
                     className="hidden md:h-full md:w-full md:flex md:flex-row"
                 >
                     <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
@@ -161,7 +162,8 @@ export default function Home() {
                     }
                 </Media>
 
-                <Media lessThan="md"
+                <Media
+                    lessThan="md"
                     className="h-full w-full flex flex-col md:hidden"
                 >
                     <TopNavBar
