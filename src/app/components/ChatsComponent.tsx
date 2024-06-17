@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/image"
 import { formatDate } from "../utils/date"
+import { nanoid } from "nanoid"
 
 type UserOrGroup = {
     name: string,
@@ -37,6 +38,7 @@ export function ChatsComponent() {
                 {
                     usersOrGroupsList.map((el) => (
                         <div
+                            key={nanoid()}
                             className="w-full flex flex-row gap-3 py-2 px-4 hover:backdrop-brightness-95 border-gray-100 border-b-2"
                         >
                             <Image
