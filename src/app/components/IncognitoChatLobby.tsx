@@ -1,8 +1,12 @@
 import React from "react";
 import { Button, Field, Fieldset, Input, Label, Legend } from "@headlessui/react";
-import type { AnonChatSideBarProps } from "./AnonChatSideBar";
 
-type IncognitoChatLobbyProps = AnonChatSideBarProps
+type IncognitoChatLobbyProps = {
+    currentRoomId: string,
+    isInRoom: boolean,
+    joinRoom: (room: string) => void,
+    leaveRoom: () => void,
+}
 
 
 
