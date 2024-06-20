@@ -1,8 +1,10 @@
 import React from "react"
 import { Switch } from "@headlessui/react"
+import { IoMdExit } from "react-icons/io"
+import Link from "next/link"
 
 
-type SettingsSideBarProps = {
+type SettingsComponentProps = {
     isDarkModeEnabled: boolean | null,
     setIsDarkModeEnabled: React.Dispatch<React.SetStateAction<boolean | null>>,
     enableDarkMode: (dark: boolean) => void,
@@ -10,7 +12,7 @@ type SettingsSideBarProps = {
 
 
 
-export function SettingsSideBar({ isDarkModeEnabled, setIsDarkModeEnabled, enableDarkMode }: SettingsSideBarProps) {
+export function SettingsComponent({ isDarkModeEnabled, setIsDarkModeEnabled, enableDarkMode }: SettingsComponentProps) {
 
     // const [enabled, setEnabled] = React.useState<boolean>(false)
     React.useEffect(() => {
@@ -41,8 +43,15 @@ export function SettingsSideBar({ isDarkModeEnabled, setIsDarkModeEnabled, enabl
         }
     }, [isDarkModeEnabled])
     return (
-        <div className="w-[calc(30vw)] h-full flex flex-col bg-white">
-            <div className="flex flex-row gap-2 px-4 py-4">
+        <div className="w-full h-full flex flex-col bg-white overflow-y-clip">
+            <div className="hidden md:block md:px-6 md:py-4">
+                <span
+                    className="font-bold text-xl"
+                >Settings</span>
+
+            </div>
+            <hr className="h-0 w-full border-b-2 border-b-gray-100/80" />
+            <div className="flex flex-row gap-4 px-4 py-4 border-b-2 border-b-gray-100/80">
                 <div>
                     <span
                     >Dark Mode</span>
@@ -55,6 +64,20 @@ export function SettingsSideBar({ isDarkModeEnabled, setIsDarkModeEnabled, enabl
                     <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
                 </Switch>
             </div>
+            <Link
+                href={"/api/auth/signout?callbackUrl=/"}
+                className="flex flex-row gap-4 px-4 py-4 border-b-2 border-b-gray-100/80"
+            >
+                <IoMdExit
+                    className="w-6 h-6 text-red-600"
+                />
+                <div>
+                    <span
+                        className="text-red-600"
+                    >Logout</span>
+                </div>
+
+            </Link>
         </div>
     )
 
