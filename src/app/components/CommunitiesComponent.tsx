@@ -3,7 +3,7 @@
 export function CommunitiesComponent() {
     return (
         <div
-            className="w-full md:min-w-96 md:w-[calc(30vw)] h-full flex flex-col bg-white overflow-y-clip"
+            className="w-full h-full flex flex-col bg-white overflow-y-clip"
 
         >
             <div className="">

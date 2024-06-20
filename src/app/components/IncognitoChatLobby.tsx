@@ -39,7 +39,7 @@ export function IncognitoChatLobby({ currentRoomId, isInRoom, joinRoom, leaveRoo
 
 
     return (
-        <div className="w-full md:min-w-96 md:w-[calc(30vw)] h-full flex flex-col bg-white overflow-y-clip">
+        <div className="w-full h-full flex flex-col bg-white overflow-y-clip">
 
             <Fieldset className={"w-full p-4"}>
                 <Legend >

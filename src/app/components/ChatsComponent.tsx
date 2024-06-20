@@ -27,7 +27,7 @@ const usersOrGroupsList = Array.from({ length: 20 }, () => usersOrGroupsListOrig
 
 export function ChatsComponent() {
     return (
-        <div className="w-full md:min-w-96 md:w-[calc(30vw)] h-full flex flex-col bg-white overflow-y-clip">
+        <div className="w-full h-full flex flex-col bg-white overflow-y-clip">
             <div className="hidden md:block md:px-6 md:py-4">
                 <span
                     className="font-bold text-xl"
