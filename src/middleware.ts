@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 export default withAuth(
     function middleware(req) {
         console.log("req.nextUrl.pathname", req.nextUrl.pathname)
-        console.log("req.nextUrl.pathname", req.nextauth.token)
+        console.log("req.nextUrl.token", req.nextauth.token)
     }
 
 )
