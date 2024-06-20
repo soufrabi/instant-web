@@ -8,7 +8,7 @@ import { AppMode } from "./components/enums";
 import type { ChatMessageData } from "./components/ChatArea"
 import { ChatArea } from "./components/ChatArea";
 import { NoAccessScreen } from "./components/NoAccessScreen";
-import { SettingsSideBar } from "./components/SettingsSideBar";
+import { SettingsComponent } from "./components/SettingsComponent";
 import { IncognitoChatLobby } from "./components/IncognitoChatLobby";
 import { TopNavBar } from "./components/TopNavBar";
 import { BottomNavBar } from "./components/BottomNavBar";
@@ -140,35 +140,38 @@ export default function Home() {
                 >
                     <LeftSmallSideBar appMode={appMode} setAppMode={setAppMode} />
 
-                    {
-                        appMode === AppMode.INCOGNITO_CHAT
-                        && <IncognitoChatLobby
-                            currentRoomId={currentRoomId}
-                            isInRoom={isInRoom}
-                            joinRoom={joinRoom}
-                            leaveRoom={leaveRoom}
-                        />
-                    }
-                    {
-                        appMode === AppMode.SETTINGS
-                        && <SettingsSideBar
-                            isDarkModeEnabled={isDarkModeEnabled}
-                            setIsDarkModeEnabled={setIsDarkModeEnabled}
-                            enableDarkMode={enableDarkMode}
-                        />
-                    }
-                    {
-                        appMode === AppMode.CHATS
-                        && <ChatsComponent />
-                    }
-                    {
-                        appMode === AppMode.CALLS
-                        && <CallsComponent />
-                    }
-                    {
-                        appMode === AppMode.COMMUNITIES
-                        && <CommunitiesComponent />
-                    }
+                    <div className="w-full md:min-w-96 md:w-[calc(30vw)]  h-[calc(100%-7.5rem)] md:h-auto">
+
+                        {
+                            appMode === AppMode.INCOGNITO_CHAT
+                            && <IncognitoChatLobby
+                                currentRoomId={currentRoomId}
+                                isInRoom={isInRoom}
+                                joinRoom={joinRoom}
+                                leaveRoom={leaveRoom}
+                            />
+                        }
+                        {
+                            appMode === AppMode.CHATS
+                            && <ChatsComponent />
+                        }
+                        {
+                            appMode === AppMode.CALLS
+                            && <CallsComponent />
+                        }
+                        {
+                            appMode === AppMode.COMMUNITIES
+                            && <CommunitiesComponent />
+                        }
+                        {
+                            appMode === AppMode.SETTINGS
+                            && <SettingsComponent
+                                isDarkModeEnabled={isDarkModeEnabled}
+                                setIsDarkModeEnabled={setIsDarkModeEnabled}
+                                enableDarkMode={enableDarkMode}
+                            />
+                        }
+                    </div>
                     {
                         isInRoom && anonId !== null
                             ? <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} maxLineSize={80} mobileDisplay={false} />
@@ -182,38 +185,49 @@ export default function Home() {
                 >
                     <TopNavBar
                         appMode={appMode}
+                        setAppMode={setAppMode}
                         showLeaveRoomButton={appMode === AppMode.INCOGNITO_CHAT && (isInRoom && anonId != null)}
                         leaveRoom={leaveRoom}
                     />
-                    {
-                        appMode === AppMode.INCOGNITO_CHAT && (isInRoom && anonId != null) &&
-                        <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} maxLineSize={30} mobileDisplay={true} />
-                    }
-                    {
-                        appMode === AppMode.INCOGNITO_CHAT && !(isInRoom && anonId != null) &&
-                        <IncognitoChatLobby
-                            currentRoomId={currentRoomId}
-                            isInRoom={isInRoom}
-                            joinRoom={joinRoom}
-                            leaveRoom={leaveRoom}
+                    <div className="w-full md:min-w-96 md:w-[calc(30vw)]  h-[calc(100%-7.5rem)] md:h-auto">
+                        {
+                            appMode === AppMode.INCOGNITO_CHAT && (isInRoom && anonId != null) &&
+                            <ChatArea myUserId={anonId} chatMessageList={chatMessageList} sendMessage={sendMessage} maxLineSize={30} mobileDisplay={true} />
+                        }
+                        {
+                            appMode === AppMode.INCOGNITO_CHAT && !(isInRoom && anonId != null) &&
+                            <IncognitoChatLobby
+                                currentRoomId={currentRoomId}
+                                isInRoom={isInRoom}
+                                joinRoom={joinRoom}
+                                leaveRoom={leaveRoom}
 
-                        />
-                    }
-                    {
-                        appMode === AppMode.CHATS &&
-                        <ChatsComponent />
-                    }
-                    {
-                        appMode === AppMode.CALLS &&
-                        <CallsComponent />
-                    }
-                    {
-                        appMode === AppMode.COMMUNITIES &&
-                        <CommunitiesComponent />
-                    }
-                    {
-                        // (appMode === AppMode.COMMUNITIES) && <NoAccessScreen />
-                    }
+                            />
+                        }
+                        {
+                            appMode === AppMode.CHATS &&
+                            <ChatsComponent />
+                        }
+                        {
+                            appMode === AppMode.CALLS &&
+                            <CallsComponent />
+                        }
+                        {
+                            appMode === AppMode.COMMUNITIES &&
+                            <CommunitiesComponent />
+                        }
+                        {
+                            appMode === AppMode.SETTINGS
+                            && <SettingsComponent
+                                isDarkModeEnabled={isDarkModeEnabled}
+                                setIsDarkModeEnabled={setIsDarkModeEnabled}
+                                enableDarkMode={enableDarkMode}
+                            />
+                        }
+                        {
+                            // (appMode === AppMode.COMMUNITIES) && <NoAccessScreen />
+                        }
+                    </div>
                     <BottomNavBar
                         appMode={appMode}
                         setAppMode={setAppMode}
