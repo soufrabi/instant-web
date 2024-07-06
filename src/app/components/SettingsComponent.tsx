@@ -1,7 +1,7 @@
 import React from "react"
 import { Switch } from "@headlessui/react"
 import { IoMdExit } from "react-icons/io"
-import Link from "next/link"
+import { signOut } from "next-auth/react"
 
 
 type SettingsComponentProps = {
@@ -64,9 +64,9 @@ export function SettingsComponent({ isDarkModeEnabled, setIsDarkModeEnabled, ena
                     <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6" />
                 </Switch>
             </div>
-            <Link
-                href={"/api/auth/signout?callbackUrl=/"}
-                className="flex flex-row gap-4 px-4 py-4 border-b-2 border-b-gray-100/80"
+            <div
+                className="flex flex-row gap-4 px-4 py-4 border-b-2 border-b-gray-100/80 cursor-pointer"
+                onClick={() => { signOut() }}
             >
                 <IoMdExit
                     className="w-6 h-6 text-red-600"
@@ -77,7 +77,7 @@ export function SettingsComponent({ isDarkModeEnabled, setIsDarkModeEnabled, ena
                     >Logout</span>
                 </div>
 
-            </Link>
+            </div>
         </div>
     )
 
