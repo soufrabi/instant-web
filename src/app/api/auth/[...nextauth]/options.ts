@@ -20,6 +20,8 @@ export const options: AuthOptions = {
         async session({ session, token }) {
             return session
         },
-
+    },
+    pages: {
+        signIn: "/login"
     }
 }

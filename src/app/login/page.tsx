@@ -1,9 +1,16 @@
+import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
+import LoginPageClient from "./LoginPageClient"
 
+export default async function LoginPage() {
+    const session = await getServerSession()
 
-export default function LoginPage() {
-    return (
-        <main className="h-screen w-screen">
-            <span>Login Page</span>
-        </main>
-    )
+    if (session) {
+        redirect("/")
+    } else {
+        // not logged in
+        return (
+            <LoginPageClient />
+        )
+    }
 }

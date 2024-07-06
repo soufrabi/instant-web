@@ -1,14 +1,20 @@
 import { withAuth } from "next-auth/middleware"
-import { NextResponse } from "next/server"
+// import { NextResponse } from "next/server"
 
 export default withAuth(
-    function middleware(req) {
-        console.log("req.nextUrl.pathname", req.nextUrl.pathname)
-        console.log("req.nextUrl.token", req.nextauth.token)
+    function middleware() {
+        // console.log("req.nextUrl.pathname", pathname)
+        // console.log("req.nextUrl.token", req.nextauth.token)
+    },
+    {
+        pages: {
+            signIn: "/login"
+        }
     }
-
 )
 
 export const config = {
-    matcher: ["/"]
+    matcher: [
+        "/",
+    ]
 }
