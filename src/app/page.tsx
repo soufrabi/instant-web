@@ -2,7 +2,7 @@
 
 import React from "react"
 import { socket } from "@/socket"
-import { MediaContextProvider, Media } from "@/app/components/media"
+import { Media } from "@/app/components/media"
 import { LeftSmallSideBar } from "./components/LeftSmallSideBar";
 import { AppMode } from "./components/enums";
 import type { ChatMessageData } from "./components/ChatArea"
@@ -131,7 +131,6 @@ export default function Home() {
     }, [])
 
     return (
-        <MediaContextProvider>
             <main className="h-[100svh] w-screen flex flex-col md:flex-row md:p-2 lg:p-4 bg-slate-300">
 
                 <Media
@@ -236,7 +235,6 @@ export default function Home() {
 
 
             </main >
-        </MediaContextProvider>
 
 
     )
