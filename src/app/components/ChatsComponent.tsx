@@ -42,7 +42,7 @@ export function ChatsComponent() {
                             className="w-full flex flex-row gap-3 py-2 px-4 hover:backdrop-brightness-95 border-gray-100 border-b-2"
                         >
                             <Image
-                                src={"/blank-avatar-64x64.jpeg"}
+                                src={"/assets/blank-avatar-64x64.jpeg"}
                                 alt=""
                                 width={50}
                                 height={50}

@@ -9,7 +9,7 @@ export function NoAccessScreen() {
             }}
         >
             <div
-                className={`absolute top-0 left-0 h-full w-full bg-[url("/dark-screen-chat-template-interface-with-chat.jpg")] bg-cover bg-center blur-md `}
+                className={`absolute top-0 left-0 h-full w-full bg-[url("/assets/dark-screen-chat-template-interface-with-chat.jpeg")] bg-cover bg-center blur-md `}
             >
 
             </div>
