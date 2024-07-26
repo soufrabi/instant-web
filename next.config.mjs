@@ -8,6 +8,14 @@ const withPWA = nextPWA({
 
 const nextConfig = {
     output: "standalone",
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "lh3.googleusercontent.com",
+            },
+        ],
+    },
 };
 
 
