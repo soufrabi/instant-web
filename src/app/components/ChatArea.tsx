@@ -26,7 +26,6 @@ export function ChatArea({ myUserId, chatMessageList, sendMessage, maxLineSize, 
         // console.log(composeMessageTextAreaValue)
         setComposeMessageTextAreaValue(ev.target.value)
     }
-    let lastKey: string = ""
 
     const scrollToBottomOfChatList = () => {
         chatListBottomRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -42,17 +41,10 @@ export function ChatArea({ myUserId, chatMessageList, sendMessage, maxLineSize, 
 
     const handleComposeMessageKeyDown = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
         // console.log(`Key pressed : {ev.key}`)
-        if (ev.key === "Enter" && lastKey !== "Shift") {
+        if (ev.key === "Enter" && !ev.shiftKey) {
             ev.preventDefault()
             handleSendButtonClick()
         }
-
-        if (ev.key !== "Enter") {
-            lastKey = ev.key
-        }
-
-        // console.log(`LastKey : ${lastKey}`)
-
     }
 
     const modifyTextBeforeDisplay = (text: string): string => {
