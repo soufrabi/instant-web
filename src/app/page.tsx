@@ -3,19 +3,19 @@
 import React from "react"
 import { socket } from "@/socket"
 import { Media } from "@/app/components/media"
-import { LeftSmallSideBar } from "./components/LeftSmallSideBar";
-import { AppMode } from "./components/enums";
-import type { ChatMessageData } from "./components/ChatArea"
-import { ChatArea } from "./components/ChatArea";
-import { NoAccessScreen } from "./components/NoAccessScreen";
-import { SettingsComponent } from "./components/SettingsComponent";
-import { IncognitoChatLobby } from "./components/IncognitoChatLobby";
-import { TopNavBar } from "./components/TopNavBar";
-import { BottomNavBar } from "./components/BottomNavBar";
-import { ChatsComponent } from "./components/ChatsComponent";
-import { CallsComponent } from "./components/CallsComponent";
-import { CommunitiesComponent } from "./components/CommunitiesComponent";
-import { ProfileComponent } from "./components/ProfileComponent"
+import { LeftSmallSideBar } from "@/app/components/LeftSmallSideBar";
+import { AppMode } from "@/app/components/enums";
+import type { ChatMessageData } from "@/app/components/ChatArea"
+import { ChatArea } from "@/app/components/ChatArea";
+import { NoAccessScreen } from "@/app/components/NoAccessScreen";
+import { SettingsComponent } from "@/app/components/SettingsComponent";
+import { IncognitoChatLobby } from "@/app/components/IncognitoChatLobby";
+import { TopNavBar } from "@/app/components/TopNavBar";
+import { BottomNavBar } from "@/app/components/BottomNavBar";
+import { ChatsComponent } from "@/app/components/ChatsComponent";
+import { CallsComponent } from "@/app/components/CallsComponent";
+import { CommunitiesComponent } from "@/app/components/CommunitiesComponent";
+import { ProfileComponent } from "@/app/components/ProfileComponent"
 
 
 
