@@ -19,7 +19,7 @@ import { ProfileComponent } from "@/app/components/ProfileComponent"
 
 
 
-export default function Home() {
+export default function HomePageClient() {
     // const [isConnected, setIsConnected] = React.useState<boolean>(false)
     // const [transportName, setTransportName] = React.useState<any | null>(null)
     const [chatMessageList, setChatMessageList] = React.useState<Array<ChatMessageData>>([])
