@@ -3,6 +3,7 @@ import clsx from "clsx"
 import { nanoid } from "nanoid"
 import { IoMdSend } from "react-icons/io"
 import Markdown from "react-markdown"
+import { useDeviceContext } from "../providers/DeviceProvider"
 import { MAX_MESSAGE_LENGTH } from "./constants"
 
 export type ChatMessageData = {
@@ -20,6 +21,7 @@ export type ChatAreaProps = {
 }
 
 export function ChatArea({ myUserId, chatMessageList, sendMessage, maxLineSize, mobileDisplay }: ChatAreaProps) {
+    const { isTouchDevice } = useDeviceContext()
     const chatListBottomRef = React.useRef<HTMLDivElement>(null)
     const [composeMessageTextAreaValue, setComposeMessageTextAreaValue] = React.useState<string>("")
     const handleComposeMessageTextAreaValueChange = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -41,7 +43,7 @@ export function ChatArea({ myUserId, chatMessageList, sendMessage, maxLineSize, 
 
     const handleComposeMessageKeyDown = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
         // console.log(`Key pressed : {ev.key}`)
-        if (ev.key === "Enter" && !ev.shiftKey) {
+        if (!isTouchDevice && ev.key === "Enter" && !ev.shiftKey) {
             ev.preventDefault()
             handleSendButtonClick()
         }
