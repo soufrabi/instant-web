@@ -12,12 +12,12 @@ type UserOrGroup = {
 const usersOrGroupsListOriginal: Array<UserOrGroup> = [
     {
         name: "Arun",
-        lastMessage: "Hi! Wanna meet",
+        lastMessage: "Hello",
         lastMessageTime: new Date(),
     },
     {
         name: "Sherry",
-        lastMessage: "Hi! Wanna meet",
+        lastMessage: "Hello!",
         lastMessageTime: new Date(1995, 6, 2),
     },
 ]
