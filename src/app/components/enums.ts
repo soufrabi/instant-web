@@ -4,5 +4,6 @@ export enum AppMode {
     CALLS,
     INCOGNITO_CHAT,
     SETTINGS,
+    PROFILE,
 }
 

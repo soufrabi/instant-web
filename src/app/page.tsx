@@ -15,6 +15,7 @@ import { BottomNavBar } from "./components/BottomNavBar";
 import { ChatsComponent } from "./components/ChatsComponent";
 import { CallsComponent } from "./components/CallsComponent";
 import { CommunitiesComponent } from "./components/CommunitiesComponent";
+import { ProfileComponent } from "./components/ProfileComponent"
 
 
 
@@ -170,6 +171,10 @@ export default function Home() {
                                 enableDarkMode={enableDarkMode}
                             />
                         }
+                        {
+                            appMode === AppMode.PROFILE
+                            && <ProfileComponent />
+                        }
                     </div>
                     {
                         isInRoom && anonId !== null
@@ -222,6 +227,10 @@ export default function Home() {
                                 setIsDarkModeEnabled={setIsDarkModeEnabled}
                                 enableDarkMode={enableDarkMode}
                             />
+                        }
+                        {
+                            appMode === AppMode.PROFILE
+                            && <ProfileComponent />
                         }
                         {
                             // (appMode === AppMode.COMMUNITIES) && <NoAccessScreen />

@@ -70,6 +70,7 @@ export function LeftSmallSideBar({ appMode, setAppMode }: LeftSmallSideBarProps)
                 <button
                     className={clsx("px-2 py-2 hover:shadow-customhovereffect rounded-2xl",
                     )}
+                    onClick={() => { setAppMode(AppMode.PROFILE) }}
                 >
                     <CgProfile
                         className="w-6 h-6"

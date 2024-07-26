@@ -50,15 +50,19 @@ function DropDownThreeDots({ appMode, setAppMode }: DropDownThreeDotsProps) {
                                 >Settings</span>
                             </div>
                         }
-                        <div
-                            className="cursor-pointer px-6 py-3 border-b-2 border-b-gray-100/80"
-                            onClick={() => {
-                                close()
-                            }}
-                        >
-                            <span
-                            >Profile</span>
-                        </div>
+                        {
+                            appMode !== AppMode.PROFILE &&
+                            <div
+                                className="cursor-pointer px-6 py-3 border-b-2 border-b-gray-100/80"
+                                onClick={() => {
+                                    setAppMode(AppMode.PROFILE)
+                                    close()
+                                }}
+                            >
+                                <span
+                                >Profile</span>
+                            </div>
+                        }
                     </PopoverPanel>
                 </>
             )
@@ -79,6 +83,8 @@ export function TopNavBar({ appMode, setAppMode, showLeaveRoomButton, leaveRoom 
                 return ["Calls", false]
             case AppMode.INCOGNITO_CHAT:
                 return ["Incognito Chat", false]
+            case AppMode.PROFILE:
+                return ["Profile",false]
             default:
                 return ["Instant", true]
         }
