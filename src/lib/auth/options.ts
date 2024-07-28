@@ -5,7 +5,7 @@ import { prisma } from "@/db/prisma/init"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { Adapter } from "next-auth/adapters"
 
-export const options: AuthOptions = {
+export const authOptions: AuthOptions = {
     adapter: PrismaAdapter(prisma) as Adapter,
     providers: [
         GoogleProvider({

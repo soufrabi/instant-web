@@ -3,10 +3,10 @@
 import HomePageClient from "./components/HomePageClient"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
-import { options } from "@/lib/auth/options"
+import { authOptions } from "@/lib/auth/options"
 
 export default async function HomePage() {
-    const session = await getServerSession(options)
+    const session = await getServerSession(authOptions)
     if (session) {
         // logged in
         return (
